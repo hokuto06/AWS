@@ -36,7 +36,7 @@ def create_task_table():
 create_task_table()
 
 # Endpoints
-@app.route('/tasks', methods=['POST'])
+@app.route('/tasks', methods=['POST'], cors=True)
 def create_task():
     request = app.current_request
     task_data = request.json_body
@@ -49,12 +49,12 @@ def create_task():
     table.put_item(Item=task_data)
     return {'message': 'Task created successfully!', 'task_id': task_id}
 
-@app.route('/tasks', methods=['GET'])
+@app.route('/tasks', methods=['GET'], cors=True)
 def list_tasks():
     response = table.scan()
     return {'tasks': response.get('Items', [])}
 
-@app.route('/tasks/{task_id}', methods=['GET'])
+@app.route('/tasks/{task_id}', methods=['GET'], cors=True)
 def get_task(task_id):
     try:
         response = table.get_item(Key={'task_id': task_id})
@@ -64,7 +64,7 @@ def get_task(task_id):
     except KeyError:
         return {'error': 'Task not found'}, 404
 
-@app.route('/tasks/{task_id}', methods=['PUT'])
+@app.route('/tasks/{task_id}', methods=['PUT'], cors=True)
 def update_task(task_id):
     request = app.current_request
     task_data = request.json_body
@@ -87,12 +87,12 @@ def update_task(task_id):
         return {'error': 'Failed to update task'}, 500
 
 
-@app.route('/tasks/{task_id}', methods=['DELETE'])
+@app.route('/tasks/{task_id}', methods=['DELETE'], cors=True)
 def delete_task(task_id):
     table.delete_item(Key={'task_id': task_id})
     return {'message': 'Task deleted successfully!'}
 
-@app.route('/tasks/{task_id}/complete', methods=['PATCH'])
+@app.route('/tasks/{task_id}/complete', methods=['PATCH'], cors=True)
 def complete_task(task_id):
     try:
         table.update_item(
@@ -107,8 +107,7 @@ def complete_task(task_id):
         return {'error': 'Failed to mark task as completed'}, 500
 
 
-
-@app.route('/')
+@app.route('/', cors=True)
 def index():
     return {'message': 'Bienvenido a la API de Gestión de Tareas'}
 
@@ -120,8 +119,7 @@ CITIES_TO_STATE = {
     'portland': 'OR',
 }
 
-
-@app.route('/cities/{city}')
+@app.route('/cities/{city}', cors=True)
 def state_of_city(city):
     try:
         return {'state': CITIES_TO_STATE[city]}
